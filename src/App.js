@@ -10,7 +10,13 @@ import axios from 'axios';
 let cancelAxios = null
 function App() {
   console.log("rendering the component");
-  const [temp, setTemp] = useState(null)
+  const [temp, setTemp] = useState({
+    number: null,
+    description: "",
+    min: null,
+    max: null,
+    icon: ""
+  }) 
   useEffect(() => {
     // const controller = new AbortController();
     axios
@@ -24,9 +30,13 @@ function App() {
         }
       )
       .then((response) => {
-        const responseTemp = Math.round(response.data.main.temp - 272.15)
-        setTemp(responseTemp )
-        console.log(responseTemp);
+        const number = Math.round(response.data.main.temp - 272.15)
+        const description = response.data.weather[0].description
+        const min = Math.round(response.data.main.temp_min - 272.15)
+        const max = Math.round(response.data.main.temp_max - 272.15)
+        const icon = response.data.weather[0].icon
+        setTemp({number: number,description: description, min: min, max: max, icon: icon})
+        console.log(response.data);
       })
       .catch((error) => {
         console.error(error);
@@ -45,6 +55,8 @@ function App() {
       <Container maxWidth="sm">
         {/* CONTEBT CONTAINER */}
         <div style={{height: "100vh", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column"}}>
+        
+        
           {/* CARD */}
           <div style={{
             background: "rgb(28 52 91 / 36%)",
@@ -73,22 +85,25 @@ function App() {
                 {/* DEGREE & DESCRIPTION */}
                 <div>
                   {/* TEMP */}
-                    <div>
-                      <Typography variant="h1" style={{textAlign: "right"}}>
-                        {temp}
-                      </Typography>
-                      {/* TODO: TEMP IMAGE */}
-                      <Typography variant="h6">
-                      broken clouds
+                  <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                    <Typography variant="h1" style={{textAlign: "right"}}>
+                      {temp.number}
                     </Typography>
-                    {/* MIN & MAX TEMP */}
-                    <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-                      <h5>الصغرى : 34</h5>
-                      <h5 style={{margin: "0 5px"}}>|</h5>
-                      <h5>الكبرى : 40</h5>
-                    </div>
-                    </div>
+                    <img src={`https://openweathermap.org/payload/api/media/file/${temp.icon}.png`} alt='no_photo'/>
+                  </div>
                   {/* == TEMP == */}
+                  {/* Description */}
+                  <Typography variant="h6">
+                    {temp.description}
+                  </Typography>
+                  {/* == Description == */}
+                  {/* MIN & MAX TEMP */}
+                  <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                    <h5>الصغرى : {temp.min}</h5>
+                    <h5 style={{margin: "0 5px"}}>|</h5>
+                    <h5>الكبرى : {temp.max}</h5>
+                  </div>
+                  {/* == MIN & MAX TEMP == */}
                 </div>
                 {/* == DEGREE & DESCRIPTION == */}
                 <CloudIcon style={{fontSize: "200px", color: "white"}}/>
@@ -98,11 +113,15 @@ function App() {
             {/* == CONTENT == */}
           </div>
           {/* == CARD == */}
+
+
           {/* TRANSLATION CONTAINER */}
           <div style={{display: "flex", justifyContent: "end", width: "100%", direction: "rtl"}}>
             <Button style={{color: "white", marginTop: "20px"}} variant="text">انكليزي</Button>
           </div>
           {/* == TRSLATION CONTAINER == */}
+
+
         </div>
         {/* == CONTEBT CONTAINER == */}
       </Container>
