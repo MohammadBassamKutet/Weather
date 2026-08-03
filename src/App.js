@@ -5,19 +5,29 @@ import CloudIcon from '@mui/icons-material/Cloud';
 import Button from '@mui/material/Button';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
+import moment from 'moment';
+import "moment/min/locales";
+import { useTranslation } from 'react-i18next';
+moment.locale("ar");  
 
 
 let cancelAxios = null
 function App() {
-  console.log("rendering the component");
+  const { t, i18n } = useTranslation();
+  const [dateAndtime,  setDateAndtime] = useState(null)
   const [temp, setTemp] = useState({
     number: null,
     description: "",
     min: null,
     max: null,
     icon: ""
-  }) 
+  })
+  const [lang, setLang] = useState("ar")
   useEffect(() => {
+    i18n.changeLanguage(lang)
+  }, []);
+  useEffect(() => {
+    setDateAndtime(moment().format("MMMM Do YYYY, h:mm:ss a"))
     // const controller = new AbortController();
     axios
       .get("https://api.openweathermap.org/data/2.5/weather?lat=33.5138&lon=36.2765&appid=585619061c995c0612e7322e751c37c9", 
@@ -50,6 +60,19 @@ function App() {
         cancelAxios()
       }
   }, [])
+  const handelChangeLanguage = () => {
+    if (lang === "ar") {
+      setLang("en")
+      i18n.changeLanguage("en")
+      moment.locale("en");  
+    } else {
+      setLang("ar")
+      i18n.changeLanguage("ar")
+      moment.locale("ar");
+    }
+
+    setDateAndtime(moment().format("MMMM Do YYYY, h:mm:ss a"))
+  }
   return (
     <div className="App">
       <Container maxWidth="sm">
@@ -65,17 +88,18 @@ function App() {
             borderRadius: "15px",
             boxShadow: "0px 11px 1px rgba(0, 0, 0, 0.05)",
             width: "100%",
-            direction: "rtl"
+            // direction: "rtl"
+            direction: lang === "ar" ? "rtl" : "ltr",
             }}>
             {/* CONTENT */}
             <div>
               {/* CITY & TIME */}
-              <div style={{display: "flex", direction: "rtl", alignItems: "end", justifyContent: "start"}}>
+              <div style={{display: "flex", direction: lang === "ar" ? "rtl" : "ltr", alignItems: "end", justifyContent: "start"}}>
                 <Typography variant="h2" style={{marginRight: "20px", fontWeight: "600"}}>
-                  الرياض
+                  {t("damascus")}
                 </Typography>
                 <Typography variant="h5" style={{marginRight: "20px"}}>
-                  الإثنين 10-10-2040
+                  {dateAndtime}
                 </Typography>
               </div>
               {/* == CITY & TIME == */}
@@ -94,14 +118,14 @@ function App() {
                   {/* == TEMP == */}
                   {/* Description */}
                   <Typography variant="h6">
-                    {temp.description}
+                    {t(temp.description)}
                   </Typography>
                   {/* == Description == */}
                   {/* MIN & MAX TEMP */}
                   <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-                    <h5>الصغرى : {temp.min}</h5>
+                    <h5>{t("min")} : {temp.min}</h5>
                     <h5 style={{margin: "0 5px"}}>|</h5>
-                    <h5>الكبرى : {temp.max}</h5>
+                    <h5>{t("max")} : {temp.max}</h5>
                   </div>
                   {/* == MIN & MAX TEMP == */}
                 </div>
@@ -116,8 +140,10 @@ function App() {
 
 
           {/* TRANSLATION CONTAINER */}
-          <div style={{display: "flex", justifyContent: "end", width: "100%", direction: "rtl"}}>
-            <Button style={{color: "white", marginTop: "20px"}} variant="text">انكليزي</Button>
+          <div style={{display: "flex", justifyContent: "end", width: "100%", direction: lang === "ar" ? "rtl" : "ltr",}}>
+            <Button style={{color: "white", marginTop: "20px"}} variant="text" onClick={handelChangeLanguage}>
+              {lang === "ar" ? "الانكليزية" : "ARABIC"}
+            </Button>
           </div>
           {/* == TRSLATION CONTAINER == */}
 
