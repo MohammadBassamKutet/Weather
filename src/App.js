@@ -23,8 +23,13 @@ function App() {
     icon: ""
   })
   const [lang, setLang] = useState("ar")
+  console.log(i18n.store.data);
+console.log(i18n.hasResourceBundle("ar", "translation"));
+console.log(i18n.getResourceBundle("ar", "translation"));
   useEffect(() => {
     i18n.changeLanguage(lang)
+    console.log("max =", t("max"));
+    console.log(i18n.language);
   }, []);
   useEffect(() => {
     setDateAndtime(moment().format("MMMM Do YYYY, h:mm:ss a"))
@@ -46,7 +51,6 @@ function App() {
         const max = Math.round(response.data.main.temp_max - 272.15)
         const icon = response.data.weather[0].icon
         setTemp({number: number,description: description, min: min, max: max, icon: icon})
-        console.log(response.data);
       })
       .catch((error) => {
         console.error(error);

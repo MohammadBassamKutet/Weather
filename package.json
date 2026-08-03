@@ -1,7 +1,7 @@
 {
   "name": "first-react-app",
   "version": "0.1.0",
-  "homepage": "https://MohammadBassamKutet/Weather",
+  "homepage": "https://MohammadBassamKutet.github.io/Weather",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.14.0",
