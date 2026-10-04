@@ -4,66 +4,32 @@ import Container from '@mui/material/Container';
 import CloudIcon from '@mui/icons-material/Cloud';
 import Button from '@mui/material/Button';
 import {useEffect, useState} from 'react';
-import axios from 'axios';
 import moment from 'moment';
 import "moment/min/locales";
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { fetchWeather } from './WeatherApiSlice';
+import CircularProgress from '@mui/material/CircularProgress';
 moment.locale("ar");  
 
 
-let cancelAxios = null
 function App() {
   const { t, i18n } = useTranslation();
   const [dateAndtime,  setDateAndtime] = useState(null)
-  const [temp, setTemp] = useState({
-    number: null,
-    description: "",
-    min: null,
-    max: null,
-    icon: ""
-  })
   const [lang, setLang] = useState("ar")
-  console.log(i18n.store.data);
-console.log(i18n.hasResourceBundle("ar", "translation"));
-console.log(i18n.getResourceBundle("ar", "translation"));
+  const dispatch = useDispatch()
+  const loading = useSelector((state)=>{
+    return state.weather.isLoading
+  })
+  const temp = useSelector((state)=>{
+    return state.weather.weather
+  })
   useEffect(() => {
-    i18n.changeLanguage(lang)
-    console.log("max =", t("max"));
-    console.log(i18n.language);
-  }, []);
-  useEffect(() => {
+    dispatch(fetchWeather())
     setDateAndtime(moment().format("MMMM Do YYYY, h:mm:ss a"))
-    // const controller = new AbortController();
-    axios
-      .get("https://api.openweathermap.org/data/2.5/weather?lat=33.5138&lon=36.2765&appid=585619061c995c0612e7322e751c37c9", 
-        {
-          // signal: controller.signal,
-          // OR 
-          cancelToken: new axios.CancelToken((c) => {
-            cancelAxios = c
-          })
-        }
-      )
-      .then((response) => {
-        const number = Math.round(response.data.main.temp - 272.15)
-        const description = response.data.weather[0].description
-        const min = Math.round(response.data.main.temp_min - 272.15)
-        const max = Math.round(response.data.main.temp_max - 272.15)
-        const icon = response.data.weather[0].icon
-        setTemp({number: number,description: description, min: min, max: max, icon: icon})
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        console.log("Request completed");
-      });
-      return () => {
-        // controller.abort();
-        console.log("clean up");
-        cancelAxios()
-      }
-  }, [])
+    i18n.changeLanguage(lang)
+  }, []);
   const handelChangeLanguage = () => {
     if (lang === "ar") {
       setLang("en")
@@ -114,6 +80,7 @@ console.log(i18n.getResourceBundle("ar", "translation"));
                 <div>
                   {/* TEMP */}
                   <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                    {loading ? <CircularProgress style={{color: "white"}}/> : ""}
                     <Typography variant="h1" style={{textAlign: "right"}}>
                       {temp.number}
                     </Typography>
